@@ -9,8 +9,31 @@ const cors = require('cors')
 dotenv.config({ path: path.join(__dirname, '.env') })
 
 const app = express()
+app.set('trust proxy', 1)
 connectDB()
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
+
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000'
+]
+if (process.env.CLIENT_URL) {
+    allowedOrigins.push(process.env.CLIENT_URL)
+    allowedOrigins.push(process.env.CLIENT_URL.replace(/\/$/, ''))
+    allowedOrigins.push(process.env.CLIENT_URL.replace(/\/$/, '') + '/')
+}
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true)
+        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || origin.includes('render.com')) {
+            callback(null, true)
+        } else {
+            console.warn(`CORS warning: Allow origin ${origin} dynamically`)
+            callback(null, true)
+        }
+    },
+    credentials: true
+}))
 app.use(express.json())
 
 const PORT = process.env.PORT || 3000

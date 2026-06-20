@@ -45,7 +45,11 @@ const Login = () => {
       toast.success(data.message || 'Welcome back!')
       navigate('/dashboard', { replace: true })
     } catch (error) {
-      const message = error.response?.data?.message || 'Could not log you in. Please try again.'
+      console.error('Login error details:', error)
+      const message = error.response?.data?.message
+        || (error.request
+          ? 'Cannot reach the server. Make sure the backend is running and the API URL is configured correctly.'
+          : 'Could not log you in. Please try again.')
 
       if (error.response?.status === 403 && message.toLowerCase().includes('not verified')) {
         sessionStorage.setItem('verificationEmail', email)

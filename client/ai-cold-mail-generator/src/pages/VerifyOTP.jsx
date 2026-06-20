@@ -69,7 +69,11 @@ const VerifyOTP = () => {
       toast.success(data.message || 'Email verified successfully!')
       navigate('/login', { replace: true, state: { verified: true } })
     } catch (error) {
-      const message = error.response?.data?.message || 'Could not verify the code. Please try again.'
+      console.error('OTP verification error details:', error)
+      const message = error.response?.data?.message
+        || (error.request
+          ? 'Cannot reach the server. Make sure the backend is running and the API URL is configured correctly.'
+          : 'Could not verify the code. Please try again.')
 
       if (message.toLowerCase().includes('already verified')) {
         sessionStorage.removeItem('verificationEmail')
