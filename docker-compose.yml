@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb+srv://mahirkumar748_db_user:Q4BcqMKfoxsAPRJQ@interview-ai-cluster.prmwjvl.mongodb.net/AiColdMail?appName=interview-ai-cluster
+      - JWT_SECRET=31728d2f6c8eb5a3b3186ad42a066ea9cb598e03a91957820043c4ae6c6fb2c7
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - EMAIL_FROM=onboarding@resend.dev
+      - CLIENT_URL=http://localhost
+    restart: always
+
+  client:
+    build:
+      context: ./client/ai-cold-mail-generator
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:3000
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    restart: always
